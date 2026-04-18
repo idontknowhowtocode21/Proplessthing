@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Notepad Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <header class="app-header">
+        <div class="top-row">
+            <div class="left-group">
+                <span class="menu-icon">☰</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Google_Drive_logo.png" class="drive-logo" alt="drive">
+                <span class="file-name" id="fileNameDisplay">Untitled3.ipynb</span>
+            </div>
+            <div class="right-group">
+                <span class="icon">🔍</span>
+                <span class="icon">➕</span>
+                <span class="icon badge">3</span>
+                <span class="icon">⋮</span>
+            </div>
+        </div>
+        <div class="sub-toolbar">
+            <span class="tool">＋</span>
+            <span class="tool">＜ ＞</span>
+            <span class="tool">⬆</span>
+            <span class="tool">⬇</span>
+            <span id="triggerBtn" class="tool clickable">🪄</span>
+            <span class="tool">🗑</span>
+            <span class="tool">⋮</span>
+            <div class="status-indicators">
+                <span class="check">✓</span>
+                <span class="label">RAM</span>
+                <div class="bar-container"><div class="bar"></div></div>
+                <span class="label">Disk</span>
+                <div class="bar-container"><div class="bar"></div></div>
+                <span class="chevron">⌃</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="editor-container">
+        <div class="code-cell">
+            <div class="cell-controls">
+                <span class="play-icon" id="secretTrigger">▶</span>
+            </div>
+            <div class="input-area">
+                <input type="text" id="noteTitle" placeholder="Title" autocomplete="off" spellcheck="false">
+                <div class="divider"></div>
+                <textarea id="noteBody" placeholder="Start typing..."></textarea>
+            </div>
+        </div>
+    </main>
+
+    <div id="peekStrip"></div>
+
+    <div id="secretWindow" class="modal hidden">
+        <div class="modal-content">
+            <h2>Vault Settings</h2>
+            <label>Reveal Template:</label>
+            <input type="text" id="templateInput" placeholder="The word is [WORD]">
+            <hr>
+            <label>Add Custom Word:</label>
+            <input type="text" id="customWordInput" placeholder="Enter word...">
+            <button id="addWordBtn">Add to Database</button>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
