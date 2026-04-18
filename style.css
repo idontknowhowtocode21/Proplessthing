@@ -1,71 +1,46 @@
 :root {
-    --bg-dark: #1e1e1e;
+    --bg-color: #1e1e1e;
     --header-bg: #2d2d2d;
-    --text-main: #d4d4d4;
-    --accent-green: #4ade80;
-    --border-color: #444;
+    --accent: #4ade80; /* The Green from your screenshot */
+    --text-dim: #9aa0a6;
+    --border: #3c4043;
 }
 
-body, html {
-    margin: 0; padding: 0;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    height: 100%; overflow: hidden;
+body {
+    margin: 0; background: var(--bg-color); color: white;
+    font-family: 'Roboto', sans-serif; overflow: hidden;
 }
 
-.app-header {
-    background: var(--header-bg);
-    border-bottom: 1px solid var(--border-color);
-    padding: 8px 12px;
+.main-header { background: var(--header-bg); border-bottom: 1px solid var(--border); padding: 5px 10px; }
+.nav-row, .tool-row { display: flex; justify-content: space-between; align-items: center; height: 35px; }
+.left { display: flex; align-items: center; gap: 12px; }
+.drive-logo { height: 18px; }
+.filename { font-size: 14px; color: #e8eaed; }
+
+.colab-status { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-dim); }
+.mini-bar { width: 25px; height: 6px; background: #3c4043; }
+.fill { height: 100%; background: #5f6368; }
+
+.cell-container { display: flex; margin-top: 20px; border-left: 4px solid var(--accent); padding-left: 10px; }
+.play-btn { color: var(--accent); font-size: 20px; cursor: pointer; }
+
+.cell-editor { width: 100%; display: flex; flex-direction: column; }
+#inputField { 
+    background: transparent; border: none; color: white; 
+    font-size: 18px; outline: none; padding: 5px;
+}
+.horizontal-line { height: 1px; background: var(--border); margin: 5px 0; }
+#outputField {
+    background: transparent; border: none; color: #bdc1c6;
+    font-size: 16px; height: 70vh; outline: none; resize: none;
 }
 
-.top-row, .sub-toolbar {
-    display: flex; justify-content: space-between; align-items: center;
-}
-
-.left-group { display: flex; align-items: center; gap: 15px; }
-.file-name { font-size: 16px; color: #fff; }
-.drive-logo { width: 18px; }
-
-.sub-toolbar { margin-top: 10px; color: #aaa; font-size: 18px; }
-.tool { padding: 0 8px; cursor: pointer; }
-
-.status-indicators { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
-.bar-container { width: 30px; height: 6px; background: #444; position: relative; }
-.bar { width: 40%; height: 100%; background: #666; }
-
-.editor-container { padding: 15px; }
-.code-cell {
-    display: flex; gap: 10px;
-    border-left: 3px solid var(--accent-green);
-    padding-left: 10px;
-}
-
-.play-icon { color: var(--accent-green); cursor: pointer; }
-
-.input-area { width: 100%; }
-#noteTitle {
-    background: transparent; border: none; color: #fff;
-    font-size: 20px; width: 100%; outline: none; padding-bottom: 5px;
-}
-
-#noteBody {
-    background: transparent; border: none; color: #aaa;
-    font-size: 16px; width: 100%; height: 60vh; outline: none;
-    resize: none; margin-top: 10px; line-height: 1.5;
-}
-
-/* Peeking Strip: Low contrast for secret viewing */
 #peekStrip {
-    position: fixed; bottom: 0; left: 0; width: 100%;
-    font-size: 10px; color: #252525; /* Very dark on dark */
-    padding: 5px; text-align: center; pointer-events: none;
+    position: fixed; bottom: 0; width: 100%; height: 20px;
+    background: transparent; color: #222; /* Near invisible on black */
+    font-size: 10px; text-align: center; pointer-events: none;
 }
 
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 99; display: flex; align-items: center; justify-content: center; }
+.modal-box { background: #333; padding: 20px; width: 80%; border-radius: 8px; }
 .hidden { display: none; }
-.modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-    display: flex; align-items: center; justify-content: center; z-index: 1000;
-}
-.modal-content { background: #333; padding: 20px; border-radius: 8px; width: 80%; }
