@@ -1,46 +1,139 @@
 :root {
-    --bg-color: #1e1e1e;
-    --header-bg: #2d2d2d;
-    --accent: #4ade80; /* The Green from your screenshot */
-    --text-dim: #9aa0a6;
-    --border: #3c4043;
+    --bg-black: #000000;
+    --text-primary: #e0e0e0;
+    --text-secondary: #8a8a8a;
+    --accent-gold: #c8a050;
+    --accent-blue: #76a9ff;
+    --nav-icon-size: 24px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    margin: 0; background: var(--bg-color); color: white;
-    font-family: 'Roboto', sans-serif; overflow: hidden;
+    background-color: var(--bg-black);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.main-header { background: var(--header-bg); border-bottom: 1px solid var(--border); padding: 5px 10px; }
-.nav-row, .tool-row { display: flex; justify-content: space-between; align-items: center; height: 35px; }
-.left { display: flex; align-items: center; gap: 12px; }
-.drive-logo { height: 18px; }
-.filename { font-size: 14px; color: #e8eaed; }
-
-.colab-status { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-dim); }
-.mini-bar { width: 25px; height: 6px; background: #3c4043; }
-.fill { height: 100%; background: #5f6368; }
-
-.cell-container { display: flex; margin-top: 20px; border-left: 4px solid var(--accent); padding-left: 10px; }
-.play-btn { color: var(--accent); font-size: 20px; cursor: pointer; }
-
-.cell-editor { width: 100%; display: flex; flex-direction: column; }
-#inputField { 
-    background: transparent; border: none; color: white; 
-    font-size: 18px; outline: none; padding: 5px;
-}
-.horizontal-line { height: 1px; background: var(--border); margin: 5px 0; }
-#outputField {
-    background: transparent; border: none; color: #bdc1c6;
-    font-size: 16px; height: 70vh; outline: none; resize: none;
+/* Status Bar Simulation */
+.status-bar {
+    height: 44px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-#peekStrip {
-    position: fixed; bottom: 0; width: 100%; height: 20px;
-    background: transparent; color: #222; /* Near invisible on black */
-    font-size: 10px; text-align: center; pointer-events: none;
+.status-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 99; display: flex; align-items: center; justify-content: center; }
-.modal-box { background: #333; padding: 20px; width: 80%; border-radius: 8px; }
-.hidden { display: none; }
+/* Header/Navigation */
+.nav-bar {
+    height: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+}
+
+.nav-right {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-bar svg {
+    color: var(--text-secondary);
+}
+
+/* Main Content */
+.editor-container {
+    flex: 1;
+    padding: 20px 24px;
+}
+
+.note-title {
+    background: transparent;
+    border: none;
+    border-left: 3px solid var(--accent-gold);
+    color: var(--text-secondary);
+    font-size: 32px;
+    font-weight: 400;
+    width: 100%;
+    padding-left: 12px;
+    margin-bottom: 8px;
+    outline: none;
+}
+
+.metadata {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-left: 15px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.category {
+    display: flex;
+    align-items: center;
+}
+
+.arrow-down {
+    border: solid var(--text-secondary);
+    border-width: 0 1px 1px 0;
+    display: inline-block;
+    padding: 2px;
+    transform: rotate(45deg);
+    margin-left: 5px;
+    margin-bottom: 2px;
+}
+
+.content-area {
+    width: 100%;
+    height: 80%;
+    background: transparent;
+    border: none;
+    resize: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+/* Bottom Toolbar */
+.bottom-toolbar {
+    height: 60px;
+    border-top: 0.5px solid #1a1a1a;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: 15px; /* Space for home indicator */
+}
+
+.tool-icon {
+    color: var(--text-secondary);
+}
+
+.home-indicator {
+    width: 140px;
+    height: 4px;
+    background: #333;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
