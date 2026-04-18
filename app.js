@@ -1,60 +1,59 @@
 import wordDB from './wordDB_100k.js';
 
-const noteTitle = document.getElementById('noteTitle');
-const noteBody = document.getElementById('noteBody');
-const secretTrigger = document.getElementById('secretTrigger');
+const inputField = document.getElementById('inputField');
+const outputField = document.getElementById('outputField');
+const executeBtn = document.getElementById('executeBtn');
 const peekStrip = document.getElementById('peekStrip');
+const menuTrigger = document.getElementById('menuTrigger');
 
-// Persistent Settings
-let revealTemplate = localStorage.getItem('revealTemplate') || "The word I think you are thinking of is [WORD]";
-let customWords = JSON.parse(localStorage.getItem('customWords') || "[]");
+// Secret Data
+let revealTemplate = localStorage.getItem('revTemp') || "Your thought of word is [WORD]";
+let customWords = JSON.parse(localStorage.getItem('custWords') || "[]");
+let fullDB = [...wordDB, ...customWords];
 
-const fullDB = [...wordDB, ...customWords];
+// Execute Method
+executeBtn.onclick = () => {
+    const code = inputField.value;
+    if (!/^\d{3,}$/.test(code)) return; // Validates 2 digits for length + vowels
 
-// Trigger the Method
-secretTrigger.addEventListener('click', performReveal);
-
-function performReveal() {
-    const val = noteTitle.value.trim();
-    if (!/^\d{3,}$/.test(val)) return;
-
-    const len = parseInt(val.substring(0, 2));
-    const vowels = val.substring(2).split('').map(Number);
+    const len = parseInt(code.substring(0, 2));
+    const vowels = code.substring(2).split('').map(Number);
 
     let matches = fullDB.filter(w => w.len === len);
-    
-    // Filter by vowel positions
-    vowels.forEach(pos => {
-        matches = matches.filter(w => w.v.includes(pos));
-    });
+    vowels.forEach(v => { matches = matches.filter(w => w.v.includes(v)); });
 
     if (matches.length === 1) {
-        noteBody.value = revealTemplate.replace('[WORD]', matches[0].word.toUpperCase());
-        peekStrip.innerText = "";
+        outputField.value = revealTemplate.replace('[WORD]', matches[0].word.toUpperCase());
     } else if (matches.length > 1) {
-        // Subtle Anagram Peek
-        const peekText = matches.map(m => m.word[0] + m.word.slice(1).split('').sort().join('')).join(" | ");
-        peekStrip.innerText = peekText;
+        // Peek Strip: Shows first letter + sorted remaining letters (simple anagram)
+        peekStrip.innerText = matches.map(m => m.word[0] + m.word.slice(1).split('').sort().join('')).join(' | ');
         
-        // Shape Branching
-        findDifferentiatingShape(matches);
-    }
-}
-
-function findDifferentiatingShape(matches) {
-    for (let i = 0; i < matches[0].len; i++) {
-        const shapes = matches.map(m => m.s[i]);
-        if (new Set(shapes).size > 1) {
-            noteBody.value = `Describe the visual shape of the letter at position ${i+1}...`;
-            break;
+        // Shape Questioning Logic
+        for (let i = 0; i < matches[0].len; i++) {
+            const shapes = new Set(matches.map(m => m.s[i]));
+            if (shapes.size > 1) {
+                outputField.value = `Think of the letter at position ${i+1}. Is it mostly straight or curved?`;
+                break;
+            }
         }
     }
-}
+};
 
-// Secret Window Logic (Long press Menu)
-document.querySelector('.menu-icon').addEventListener('touchstart', (e) => {
-    let timer = setTimeout(() => {
-        document.getElementById('secretWindow').classList.remove('hidden');
-    }, 2000);
-    e.target.addEventListener('touchend', () => clearTimeout(timer));
-});
+// Long Press Logic for Secret Menu
+let pressTimer;
+menuTrigger.ontouchstart = () => {
+    pressTimer = setTimeout(() => {
+        document.getElementById('secretMenu').classList.remove('hidden');
+    }, 3000); // 3 Seconds
+};
+menuTrigger.ontouchend = () => clearTimeout(pressTimer);
+
+// Modal Closing & Template Updating
+document.getElementById('closeMenu').onclick = () => {
+    const newTemp = document.getElementById('templateSetting').value;
+    if (newTemp) {
+        revealTemplate = newTemp;
+        localStorage.setItem('revTemp', newTemp);
+    }
+    document.getElementById('secretMenu').classList.add('hidden');
+};
