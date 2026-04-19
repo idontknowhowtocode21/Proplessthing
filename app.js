@@ -1,19 +1,28 @@
 let currentMatches = [];
-let dbActive = false;
+let wordDB = [];
+let dbReady = false;
+
 const titleInput = document.getElementById('title-input');
 const debugLog = document.getElementById('debug-log');
 const noteBody = document.getElementById('note-body');
 const metaRow = document.getElementById('meta-row');
 
-// 1. HARD-LOADER LOOP
-function bootApp() {
-    if (typeof wordDB !== 'undefined') {
-        dbActive = true;
+// 1. HIGH-SPEED DATABASE FETCH
+async function initDB() {
+    try {
+        const response = await fetch('wordDB_100k.js');
+        const text = await response.text();
+        
+        // Clean the "const wordDB =" part to get pure JSON
+        const jsonContent = text.substring(text.indexOf('['), text.lastIndexOf(']') + 1);
+        wordDB = JSON.parse(jsonContent);
+        
+        dbReady = true;
         debugLog.innerText = "READY";
         updateTime();
-    } else {
-        debugLog.innerText = "LINKING DB...";
-        setTimeout(bootApp, 300); // Check every 0.3s
+    } catch (err) {
+        debugLog.innerText = "OFFLINE ERROR";
+        console.error(err);
     }
 }
 
@@ -21,66 +30,55 @@ function updateTime() {
     const now = new Date();
     let hh = now.getHours();
     const mm = now.getMinutes().toString().padStart(2, '0');
-    const suffix = hh >= 12 ? 'pm' : 'am';
+    const ampm = hh >= 12 ? 'pm' : 'am';
     hh = hh % 12 || 12;
-    metaRow.innerHTML = `Today ${hh}:${mm} ${suffix} &nbsp;No category`;
+    metaRow.innerHTML = `Today ${hh}:${mm} ${ampm} &nbsp;No category`;
 }
 
-// 2. SEARCH ENGINE
+// 2. LOGIC (Optimized for 100k words)
 document.getElementById('btn-search').addEventListener('click', () => {
-    if (!dbActive) return;
-    const val = titleInput.value.trim().toLowerCase();
-    if (!val) return;
+    if (!dbReady) return;
+    const input = titleInput.value.trim().toLowerCase();
+    if (!input) return;
 
-    // SCENARIO A: NUMBERS (Length / Vowels)
-    if (/^\d+$/.test(val)) {
-        if (currentMatches.length === 0) {
-            // New Search: e.g., 040102
-            const targetLen = parseInt(val.substring(0, 2));
-            let targets = [];
-            for (let i = 2; i < val.length; i += 2) {
-                let p = parseInt(val.substring(i, i + 2));
-                if (!isNaN(p)) targets.push(p);
+    if (/^\d+$/.test(input)) {
+        // Initial search vs refinement
+        let source = (currentMatches.length === 0) ? wordDB : currentMatches;
+
+        if (input.length >= 2 && currentMatches.length === 0) {
+            const L = parseInt(input.substring(0, 2));
+            const V = [];
+            for (let i = 2; i < input.length; i += 2) {
+                V.push(parseInt(input.substring(i, i + 2)));
             }
-            currentMatches = wordDB.filter(item => 
-                item.len === targetLen && targets.every(t => item.v.includes(t))
-            );
+            currentMatches = source.filter(x => x.len === L && V.every(vPos => x.v.includes(vPos)));
         } else {
-            // Refine hit list: e.g., 07
-            const p = parseInt(val);
-            currentMatches = currentMatches.filter(item => item.v.includes(p));
+            const pos = parseInt(input);
+            currentMatches = currentMatches.filter(x => x.v.includes(pos));
         }
-    } 
-    // SCENARIO B: LETTERS (Shapes s, c, m)
-    else if (/^[scm]+$/.test(val)) {
-        const shapes = val.split('');
-        currentMatches = currentMatches.filter(item => 
-            shapes.every((s, i) => item.s[i] === s)
-        );
+    } else if (/^[scm]+$/.test(input)) {
+        const s = input.split('');
+        currentMatches = currentMatches.filter(x => s.every((char, i) => x.s[i] === char));
     }
-
-    render();
+    
+    showResult();
 });
 
-function render() {
+function showResult() {
     if (currentMatches.length > 1) {
-        // Multi-hits: Hidden in the dark at the bottom
         debugLog.innerText = currentMatches.slice(0, 4).map(x => x.word).join(" | ");
         titleInput.value = "";
-        titleInput.placeholder = "Tasks";
     } else if (currentMatches.length === 1) {
-        // Single hit: The Revelation
         titleInput.value = "Your word is";
         noteBody.innerText = currentMatches[0].word;
         debugLog.innerText = "";
-        if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+        if (navigator.vibrate) navigator.vibrate([40, 40, 40]);
     } else {
         debugLog.innerText = "NO MATCH";
         currentMatches = [];
     }
 }
 
-// 3. NUCLEAR RESET (Top Left Button)
 document.getElementById('btn-reset').addEventListener('click', () => {
     currentMatches = [];
     titleInput.value = "";
@@ -88,7 +86,6 @@ document.getElementById('btn-reset').addEventListener('click', () => {
     noteBody.innerText = "";
     debugLog.innerText = "READY";
     updateTime();
-    if (navigator.vibrate) navigator.vibrate(10);
 });
 
-bootApp();
+initDB();
