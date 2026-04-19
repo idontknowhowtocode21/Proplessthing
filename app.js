@@ -1,96 +1,94 @@
 let currentMatches = [];
+let dbActive = false;
 const titleInput = document.getElementById('title-input');
 const debugLog = document.getElementById('debug-log');
 const noteBody = document.getElementById('note-body');
 const metaRow = document.getElementById('meta-row');
 
-// 1. Database Readiness Check
-window.onload = () => {
+// 1. HARD-LOADER LOOP
+function bootApp() {
     if (typeof wordDB !== 'undefined') {
+        dbActive = true;
         debugLog.innerText = "READY";
-        updateTimestamp();
+        updateTime();
     } else {
-        debugLog.innerText = "DB ERROR: wordDB NOT LOADED";
-        debugLog.style.color = "red";
+        debugLog.innerText = "LINKING DB...";
+        setTimeout(bootApp, 300); // Check every 0.3s
     }
-};
-
-function updateTimestamp() {
-    const now = new Date();
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12 || 12;
-    metaRow.innerHTML = `Today ${hours}:${minutes} ${ampm} &nbsp;No category`;
 }
 
-// 2. Search Execution
+function updateTime() {
+    const now = new Date();
+    let hh = now.getHours();
+    const mm = now.getMinutes().toString().padStart(2, '0');
+    const suffix = hh >= 12 ? 'pm' : 'am';
+    hh = hh % 12 || 12;
+    metaRow.innerHTML = `Today ${hh}:${mm} ${suffix} &nbsp;No category`;
+}
+
+// 2. SEARCH ENGINE
 document.getElementById('btn-search').addEventListener('click', () => {
-    const rawInput = titleInput.value.trim().toLowerCase();
-    if (!rawInput || typeof wordDB === 'undefined') return;
+    if (!dbActive) return;
+    const val = titleInput.value.trim().toLowerCase();
+    if (!val) return;
 
-    // NUMERIC ROUTE (Length + Vowel Positions)
-    if (/^\d+$/.test(rawInput)) {
+    // SCENARIO A: NUMBERS (Length / Vowels)
+    if (/^\d+$/.test(val)) {
         if (currentMatches.length === 0) {
-            // New Search: e.g., 090204
-            const targetLen = parseInt(rawInput.substring(0, 2));
-            let targetVowels = [];
-            for (let i = 2; i < rawInput.length; i += 2) {
-                let v = parseInt(rawInput.substring(i, i + 2));
-                if (!isNaN(v)) targetVowels.push(v);
+            // New Search: e.g., 040102
+            const targetLen = parseInt(val.substring(0, 2));
+            let targets = [];
+            for (let i = 2; i < val.length; i += 2) {
+                let p = parseInt(val.substring(i, i + 2));
+                if (!isNaN(p)) targets.push(p);
             }
-
-            currentMatches = wordDB.filter(item => {
-                if (item.len !== targetLen) return false;
-                return targetVowels.every(pos => item.v.includes(pos));
-            });
+            currentMatches = wordDB.filter(item => 
+                item.len === targetLen && targets.every(t => item.v.includes(t))
+            );
         } else {
-            // Refining existing matches: e.g., 07
-            const vPos = parseInt(rawInput);
-            currentMatches = currentMatches.filter(item => item.v.includes(vPos));
+            // Refine hit list: e.g., 07
+            const p = parseInt(val);
+            currentMatches = currentMatches.filter(item => item.v.includes(p));
         }
     } 
-    // SHAPE ROUTE (s, c, m)
-    else if (/^[scm]+$/.test(rawInput)) {
-        const shapes = rawInput.split('');
-        currentMatches = currentMatches.filter(item => {
-            return shapes.every((char, idx) => item.s[idx] === char);
-        });
+    // SCENARIO B: LETTERS (Shapes s, c, m)
+    else if (/^[scm]+$/.test(val)) {
+        const shapes = val.split('');
+        currentMatches = currentMatches.filter(item => 
+            shapes.every((s, i) => item.s[i] === s)
+        );
     }
 
-    finalizeResults();
+    render();
 });
 
-function finalizeResults() {
-    const count = currentMatches.length;
-    
-    if (count > 1) {
-        // Show hidden hits
-        debugLog.innerText = currentMatches.slice(0, 4).map(w => w.word).join(" | ");
+function render() {
+    if (currentMatches.length > 1) {
+        // Multi-hits: Hidden in the dark at the bottom
+        debugLog.innerText = currentMatches.slice(0, 4).map(x => x.word).join(" | ");
         titleInput.value = "";
-        titleInput.placeholder = "Title";
-        if (navigator.vibrate) navigator.vibrate(20);
-    } 
-    else if (count === 1) {
-        // Found it
-        const result = currentMatches[0].word;
+        titleInput.placeholder = "Tasks";
+    } else if (currentMatches.length === 1) {
+        // Single hit: The Revelation
         titleInput.value = "Your word is";
-        noteBody.innerText = result;
+        noteBody.innerText = currentMatches[0].word;
         debugLog.innerText = "";
-        if (navigator.vibrate) navigator.vibrate([40, 40, 40]);
+        if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
     } else {
         debugLog.innerText = "NO MATCH";
-        titleInput.value = "";
+        currentMatches = [];
     }
 }
 
-// 3. Reset Button (Top Left)
+// 3. NUCLEAR RESET (Top Left Button)
 document.getElementById('btn-reset').addEventListener('click', () => {
     currentMatches = [];
     titleInput.value = "";
     titleInput.placeholder = "Title";
     noteBody.innerText = "";
     debugLog.innerText = "READY";
-    updateTimestamp();
+    updateTime();
     if (navigator.vibrate) navigator.vibrate(10);
 });
+
+bootApp();
