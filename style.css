@@ -34,4 +34,4 @@ body {
 .toolbar { display: flex; justify-content: space-around; align-items: center; padding: 8px 10px; }
 .tool-svg { width: 26px; height: 26px; fill: #e3e3e3; }
 
-.nav-icon:active, .tool-svg:active { opacity: 0.5; transform: scale(0.9); }
+.nav-icon:active, .tool-svg:active { opacity: 0.5; transform: scale(0.9); transition: 0.1s; }
