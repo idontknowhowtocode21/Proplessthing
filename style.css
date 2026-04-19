@@ -26,12 +26,12 @@ body {
 
 .content { flex: 1; padding: 10px 24px; }
 .note-title-input { background: transparent; border: none; outline: none; font-size: 24px; font-weight: 700; color: #fff; width: 100%; }
-.note-title-input::placeholder { color: #4d4d4d; }
 .meta-row { font-size: 12px; color: var(--text-grey); margin: 10px 0 20px 0; }
 #note-body { font-size: 16px; line-height: 1.6; white-space: pre-wrap; outline: none; caret-color: #007aff; }
 
 .footer { padding-bottom: calc(10px + env(safe-area-inset-bottom)); background: var(--bg-black); }
 .toolbar { display: flex; justify-content: space-around; align-items: center; padding: 8px 10px; }
-.tool-svg { width: 26px; height: 26px; fill: #e3e3e3; }
+.tool-btn { padding: 5px; }
+.tool-svg { width: 26px; height: 26px; fill: #e3e3e3; pointer-events: none; }
 
-.nav-icon:active, .tool-svg:active { opacity: 0.5; transform: scale(0.9); transition: 0.1s; }
+.nav-icon:active, .tool-btn:active { opacity: 0.5; transform: scale(0.9); }
